@@ -8,6 +8,7 @@ const DEFAULT_SOURCE_PATH = path.resolve(__dirname, 'fixtures/source.css');
 const DEFAULT_EXPECTED_PATH = path.resolve(__dirname, 'fixtures/source.expected.css');
 const IGNORE_SOURCE_PATH = path.resolve(__dirname, 'fixtures/ignore.css');
 const IGNORE_EXPECTED_PATH = path.resolve(__dirname, 'fixtures/ignore.expected.css');
+const IGNORE_FILE_SOURCE_PATH = path.resolve(__dirname, 'fixtures/ignore-file.css');
 
 const mocks = {
   default: {
@@ -17,6 +18,9 @@ const mocks = {
   ignore: {
     source: fs.readFileSync(IGNORE_SOURCE_PATH, 'utf8').trim(),
     expected: fs.readFileSync(IGNORE_EXPECTED_PATH, 'utf8').trim(),
+  },
+  ignoreFile: {
+    source: fs.readFileSync(IGNORE_FILE_SOURCE_PATH, 'utf8').trim(),
   },
 };
 
@@ -81,5 +85,13 @@ describe('Prefixer', () => {
       })).process(mocks.ignore.source);
 
     expect(css).toEqual(mocks.ignore.expected);
+  });
+
+  test('should not prefix file with @ignore comment', () => {
+    const { css } = postcss()
+      .use(postcssPrefixer())
+      .process(mocks.ignoreFile.source);
+
+    expect(css).toEqual(mocks.ignoreFile.source);
   });
 });
